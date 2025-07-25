@@ -526,22 +526,16 @@ export default function UltraModernAutoPartsSearch() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[
                   {
-                    title: "Industrial Plant Animation",
+                    title: "MotionPix India Corporate Video",
                     description:
-                      "A detailed 3D animation of a manufacturing plant.",
-                    videoId: "dQw4w9WgXcQ",
-                  },
-                  {
-                    title: "Cinematic Product Showcase",
-                    description:
-                      "A cinematic video showcasing a new product launch.",
+                      "Our corporate profile.",
                     videoId: "eYq7WapuDLU",
                   },
                   {
-                    title: "Augmented Reality Experience",
+                    title: "3D Show Reel",
                     description:
-                      "An AR experience for an automotive exhibition.",
-                    videoId: "tgbNymZ7vqY",
+                      "Our 3D video show reel",
+                    videoId: "ZpkMrCETUyA",
                   },
                 ].map((project, index) => (
                   <div
