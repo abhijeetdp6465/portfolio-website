@@ -113,7 +113,7 @@ const AnimeSphereAnimation = () => {
   }, [])
 
   return (
-    <div className="flex h-screen w-full items-center justify-center">
+    <div className="flex h-screen w-full items-center justify-center z-0">
       <div className="relative w-1/2 pb-[50%]">
         <div ref={sphereRef} className="absolute left-1/2 top-1/2 -ml-[290px] -mt-[290px] h-[580px] w-[580px]">
           <svg className="sphere" viewBox="0 0 440 440" stroke="rgba(80,80,80,.35)">
