@@ -18,6 +18,7 @@ import {
   RefreshCw,
   Check,
   Loader2,
+  DownloadIcon,
 } from "lucide-react";
 import { Facebook, Instagram, Linkedin, Youtube, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -317,7 +318,14 @@ export default function UltraModernAutoPartsSearch() {
                     : "opacity-100 translate-y-0"
                 )}
               >
-                Your digital branding partner
+                Your digital branding partner{"    "}
+                {/* add pdf download button */}
+                <Button variant="secondary" 
+                 className="text-black/70 ml-2 mt-4  hover:text-black transition-colors"
+                 onClick={() => window.open('/Motionpix.pdf', '_blank')}>
+                  <DownloadIcon className="w-4 h-4 inline-block mr-1" />
+                  Download PDF
+                </Button>
               </p>
 
             </div>
