@@ -122,6 +122,7 @@ export default function RootLayout({
   dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
 />
 
+<meta name="google-site-verification" content="8P17svm1vgfIs13oCbk6sSzoLWvOr5zMdl3h-tYe-GI" />
       </head>
       <body className={inter.className}>
         <Suspense
