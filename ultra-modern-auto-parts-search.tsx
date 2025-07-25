@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react";
 // Добавьте после других импортов
 import {
   Search,
@@ -17,118 +17,164 @@ import {
   DollarSign,
   RefreshCw,
   Check,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
-import Image from "next/image"
-import { TracingBeam } from "@/components/tracing-beam"
-import AnimeSphereAnimation from "@/components/anime-sphere-animation"
+  Loader2,
+} from "lucide-react";
+import { Facebook, Instagram, Linkedin, Youtube, Twitter } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
+import { TracingBeam } from "@/components/tracing-beam";
+import AnimeSphereAnimation from "@/components/anime-sphere-animation";
+import { Mail } from "lucide-react";
+import Link from "next/link";
 
 // Компонент для анимированного placeholder
-function AnimatedPlaceholder({ texts, className }: { texts: string[]; className?: string }) {
-  const [currentTextIndex, setCurrentTextIndex] = useState(0)
-  const [currentText, setCurrentText] = useState("")
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [typingSpeed, setTypingSpeed] = useState(80)
+function AnimatedPlaceholder({
+  texts,
+  className,
+}: {
+  texts: string[];
+  className?: string;
+}) {
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [currentText, setCurrentText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [typingSpeed, setTypingSpeed] = useState(80);
 
   useEffect(() => {
-    const text = texts[currentTextIndex]
+    const text = texts[currentTextIndex];
 
     const timeout = setTimeout(() => {
       if (!isDeleting) {
         // Печатаем текст
         if (currentText.length < text.length) {
-          setCurrentText(text.substring(0, currentText.length + 1))
-          setTypingSpeed(80)
+          setCurrentText(text.substring(0, currentText.length + 1));
+          setTypingSpeed(80);
         } else {
           // Пауза перед удалением
-          setIsDeleting(true)
-          setTypingSpeed(1000)
+          setIsDeleting(true);
+          setTypingSpeed(1000);
         }
       } else {
         // Удаляем текст
         if (currentText.length > 0) {
-          setCurrentText(text.substring(0, currentText.length - 1))
-          setTypingSpeed(40)
+          setCurrentText(text.substring(0, currentText.length - 1));
+          setTypingSpeed(40);
         } else {
           // Переход к следующему тексту
-          setIsDeleting(false)
-          setCurrentTextIndex((currentTextIndex + 1) % texts.length)
-          setTypingSpeed(500)
+          setIsDeleting(false);
+          setCurrentTextIndex((currentTextIndex + 1) % texts.length);
+          setTypingSpeed(500);
         }
       }
-    }, typingSpeed)
+    }, typingSpeed);
 
-    return () => clearTimeout(timeout)
-  }, [currentText, currentTextIndex, isDeleting, texts, typingSpeed])
+    return () => clearTimeout(timeout);
+  }, [currentText, currentTextIndex, isDeleting, texts, typingSpeed]);
 
   return (
     <span className={className}>
       {currentText}
       <span className="animate-pulse">|</span>
     </span>
-  )
+  );
 }
 
 export default function UltraModernAutoPartsSearch() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [city, setCity] = useState("Москва")
-  const [searchFocused, setSearchFocused] = useState(false)
-  const [activeSection, setActiveSection] = useState("search")
-  const [showResults, setShowResults] = useState(false)
-  const [selectedPart, setSelectedPart] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState("");
+  const [city, setCity] = useState("Москва");
+  const [loading, setLoading] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const searchInputRef = useRef<HTMLInputElement>(null)
-  const resultsRef = useRef<HTMLDivElement>(null)
-  const searchSectionRef = useRef<HTMLElement>(null)
-  const howSectionRef = useRef<HTMLElement>(null)
-  const pricingSectionRef = useRef<HTMLElement>(null)
-  const businessSectionRef = useRef<HTMLElement>(null)
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [activeSection, setActiveSection] = useState("search");
+  const [showResults, setShowResults] = useState(false);
+  const [selectedPart, setSelectedPart] = useState<string | null>(null);
+
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const searchSectionRef = useRef<HTMLElement>(null);
+  const howSectionRef = useRef<HTMLElement>(null);
+  const pricingSectionRef = useRef<HTMLElement>(null);
+  const businessSectionRef = useRef<HTMLElement>(null);
+  const aboutSectionRef = useRef<HTMLElement>(null);
+  const contactSectionRef = useRef<HTMLElement>(null);
 
   // Handle search submission
   const handleSearch = (e?: React.FormEvent) => {
-    if (e) e.preventDefault()
+    if (e) e.preventDefault();
     if (searchQuery.trim()) {
-      setShowResults(true)
+      setShowResults(true);
       // Scroll to results after a small delay to allow for animation
       setTimeout(() => {
-        resultsRef.current?.scrollIntoView({ behavior: "smooth" })
-      }, 100)
+        resultsRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     }
-  }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData(formRef.current!);
+    const data = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      subject: `Phone: ${formData.get("phone")}`,
+      message: formData.get("message"),
+    };
+
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    setLoading(false);
+
+    if (res.ok) {
+      alert("Message sent successfully! 🎉");
+      formRef.current?.reset();
+    } else {
+      alert("Failed to send message. Please try again later.");
+    }
+  };
 
   // Handle escape key to close search results
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setShowResults(false)
+        setShowResults(false);
       }
-    }
+    };
 
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [])
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Focus search input on initial load
 
-
   // Scroll to section when menu item is clicked
   const scrollToSection = (sectionId: string) => {
-    setActiveSection(sectionId)
+    setActiveSection(sectionId);
 
     const sectionMap = {
       search: searchSectionRef,
       how: howSectionRef,
       pricing: pricingSectionRef,
       business: businessSectionRef,
-    }
+      about: aboutSectionRef,
+      contact: contactSectionRef,
+    };
 
-    const sectionRef = sectionMap[sectionId as keyof typeof sectionMap]
+    const sectionRef = sectionMap[sectionId as keyof typeof sectionMap];
     if (sectionRef.current) {
-      sectionRef.current.scrollIntoView({ behavior: "smooth" })
+      sectionRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }
+  };
 
   // Handle scroll events for active section detection
   useEffect(() => {
@@ -139,29 +185,27 @@ export default function UltraModernAutoPartsSearch() {
         { id: "how", ref: howSectionRef },
         { id: "pricing", ref: pricingSectionRef },
         { id: "business", ref: businessSectionRef },
-      ]
+        { id: "about", ref: aboutSectionRef },
+        { id: "contact", ref: contactSectionRef },
+      ];
 
       for (const section of sections) {
         if (section.ref.current) {
-          const rect = section.ref.current.getBoundingClientRect()
+          const rect = section.ref.current.getBoundingClientRect();
           if (rect.top <= 100 && rect.bottom >= 100) {
-            setActiveSection(section.id)
-            break
+            setActiveSection(section.id);
+            break;
           }
         }
       }
-    }
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
-
-
-
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white  z-0 overflow-x-hidden overflow-hidden">
       {/* Background elements */}
       <div className="fixed inset-0 z-0">
         {/* Gradient background */}
@@ -185,53 +229,34 @@ export default function UltraModernAutoPartsSearch() {
       </div>
 
       {/* Main content */}
-      <div className="relative z-10">
+      <div className="relative z-0">
         {/* Header */}
-        <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-black/30 border-b border-white/5">
+        <header className="fixed top-0 left-0 right-0 z-[100] backdrop-blur-md bg-black/30 border-b border-white/5">
           <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-            <span className="font-bold text-lg tracking-tight">AUTOPARTS</span>
-
+            {/* add logo from assets */}
             <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                className={cn(
-                  "text-white/70 hover:text-white hover:bg-white/5 rounded-full",
-                  activeSection === "search" && "text-white bg-white/5",
-                )}
-                onClick={() => scrollToSection("search")}
-              >
-                Search
-              </Button>
-              <Button
-                variant="ghost"
-                className={cn(
-                  "text-white/70 hover:text-white hover:bg-white/5 rounded-full",
-                  activeSection === "how" && "text-white bg-white/5",
-                )}
-                onClick={() => scrollToSection("how")}
-              >
-                How it works
-              </Button>
-              <Button
-                variant="ghost"
-                className={cn(
-                  "text-white/70 hover:text-white hover:bg-white/5 rounded-full",
-                  activeSection === "pricing" && "text-white bg-white/5",
-                )}
-                onClick={() => scrollToSection("pricing")}
-              >
-                Pricing
-              </Button>
-              <Button
-                variant="ghost"
-                className={cn(
-                  "text-white/70 hover:text-white hover:bg-white/5 rounded-full",
-                  activeSection === "business" && "text-white bg-white/5",
-                )}
-                onClick={() => scrollToSection("business")}
-              >
-                For Business
-              </Button>
+              <Link href="/" className="flex items-center">
+                <Image src="/Logo.png" alt="Logo" height={50} width={50} />
+              </Link>
+            </div>
+            <div className="flex items-center gap-4">
+              {/* add simple links to #about # contact us button with good design */}
+              <div className="flex gap-6">
+                <Button
+                  variant="link"
+                  className={cn(
+                    "text-white/70 hover:text-white transition-colors",
+                    activeSection === "about" ? "text-white" : ""
+                  )}
+                  onClick={() => scrollToSection("about")}
+                >
+                  About Us
+                </Button>
+
+                <Button onClick={() => scrollToSection("contact")}>
+                  Connect
+                </Button>
+              </div>
             </div>
           </div>
         </header>
@@ -242,7 +267,7 @@ export default function UltraModernAutoPartsSearch() {
           <section
             ref={searchSectionRef}
             id="search"
-            className="min-h-[90vh] flex flex-col items-center justify-center px-4 relative"
+            className="min-h-[90vh] flex flex-col items-center justify-center px-4 relative z-10"
           >
             <div className="absolute inset-0 -z-10">
               <AnimeSphereAnimation />
@@ -250,29 +275,50 @@ export default function UltraModernAutoPartsSearch() {
             <div
               className={cn(
                 "max-w-4xl w-full transition-all duration-500 ease-out",
-                searchFocused ? "scale-105" : "scale-100",
+                searchFocused ? "scale-105" : "scale-100"
               )}
             >
+              {/* can you add logo  */}
+              <div className="flex justify-center mb-8">
+                <Image
+                  src="/Logo.png"
+                  alt="Logo"
+                  width={100}
+                  height={100}
+                  className="rounded-full"
+                />
+              </div>
               <h1
                 className={cn(
-                  "text-5xl md:text-7xl font-bold mb-6 text-center transition-all duration-500",
-                  searchFocused ? "opacity-0 -translate-y-10" : "opacity-100 translate-y-0",
+                  "text-5xl md:text-7xl font-bold mb-4 text-center transition-all duration-500",
+                  searchFocused
+                    ? "opacity-0 -translate-y-10"
+                    : "opacity-100 translate-y-0"
                 )}
               >
-                Find auto parts instantly
+                Motion<span className="text-red-700">Pix</span> India
               </h1>
-
               <p
                 className={cn(
-                  "text-xl text-white/70 text-center mb-12 max-w-2xl mx-auto transition-all duration-500",
-                  searchFocused ? "opacity-0 -translate-y-10" : "opacity-100 translate-y-0",
+                  "text-xl md:text-xl mb-6 text-center text-white/70 transition-all duration-500",
+                  searchFocused
+                    ? "opacity-0 -translate-y-10"
+                    : "opacity-100 translate-y-0"
                 )}
               >
-                Instant search across thousands of stores in your city powered by artificial intelligence
+                Motionpix cinematix india private limited
               </p>
-
-
-
+              {/* add divider */}
+              <p
+                className={cn(
+                  "text-xl md:text-xl font-bold mb-6  text-center transition-all capitalize duration-500",
+                  searchFocused
+                    ? "opacity-0 -translate-y-10"
+                    : "opacity-100 translate-y-0"
+                )}
+              >
+                Your digital branding partner
+              </p>
 
             </div>
 
@@ -280,319 +326,347 @@ export default function UltraModernAutoPartsSearch() {
             <div
               className={cn(
                 "absolute bottom-8 left-0 right-0 flex justify-center gap-16 transition-all duration-500",
-                searchFocused ? "opacity-0 translate-y-10" : "opacity-100 translate-y-0",
+                searchFocused
+                  ? "opacity-0 translate-y-10"
+                  : "opacity-100 translate-y-0"
               )}
             >
               <div className="text-center">
-                <div className="text-3xl font-bold">5000+</div>
-                <div className="text-white/50 text-sm">Stores</div>
+                <div className="text-3xl font-bold">20+</div>
+                <div className="text-white/50 text-sm">
+                  visual design experts
+                </div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold">1M+</div>
-                <div className="text-white/50 text-sm">Parts</div>
+                <div className="text-3xl font-bold">15+</div>
+                <div className="text-white/50 text-sm">years of experience</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold">30+</div>
-                <div className="text-white/50 text-sm">Seconds to search</div>
+                <div className="text-3xl font-bold">100+</div>
+                <div className="text-white/50 text-sm">
+                  successful projects delivered
+                </div>
+              </div>
+            </div>
+          </section>
+          <p
+            className={cn(
+              "text-xl text-white/70 text-center mb-12 max-w-2xl mx-auto transition-all duration-500",
+              searchFocused
+                ? "opacity-0 -translate-y-10"
+                : "opacity-100 translate-y-0"
+            )}
+          >
+            We craft next-gen 3D industrial visuals, cinematic experiences, and
+            AR/VR content.{" "}
+          </p>
+
+          {/* add about us section for motionpix */}
+
+          <section
+            ref={aboutSectionRef}
+            id="about"
+            className=" py-16 my-16 px-4 bg-black/50 backdrop-blur-sm border-t rounded-2xl border-white/5 scroll-mt-40"
+          >
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-center">
+                About Us
+              </h2>
+              <p className="text-white/70 text-center max-w-3xl mx-auto mb-12">
+                At Motionpix Pvt Ltd, we blend creativity with cutting-edge
+                technology to deliver stunning 3D visuals, cinematic
+                experiences, and immersive AR/VR content. Our team of experts is
+                dedicated to pushing the boundaries of what's possible in the
+                world of digital media.
+              </p>
+              {/* add heading why Why Motionpix? */}
+              <h3 className="text-2xl md:text-3xl font-bold mb-4 text-center">
+                Why Motionpix?
+              </h3>
+              <p className="text-white/70 text-center max-w-2xl mx-auto mb-12">
+                We bring your unseen mind’s ideas to life through creative
+                motion graphics and immersive visual content. With over 15 years
+                of experience and a team of 20+ design experts, we’ve delivered
+                100+ successful projects.
+              </p>
+            </div>
+          </section>
+
+          {/* add Services  section what we offer */}
+<div className="relative z-10 my-10 px-4 md:px-8">
+  <div className="max-w-6xl mx-auto rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-10 backdrop-blur-md shadow-xl">
+    <h2 className="text-3xl md:text-5xl font-bold text-center text-white mb-4 md:mb-6">
+      Our Services
+    </h2>
+    <p className="text-white/70 text-center max-w-2xl mx-auto mb-10 text-sm sm:text-base">
+      At Motionpix, we deliver cutting-edge digital experiences through our comprehensive services:
+    </p>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {[
+        "3D Modeling & Animation",
+        "Cinematic Video Production",
+        "Augmented Reality (AR) Experiences",
+        "Virtual Reality (VR) Content Creation",
+        "Motion Graphics Design",
+        "Process Animations & Visualizations",
+        "Plant Visualizations",
+        "Greenfield Projects & Plant Animations",
+        "Proposal & Project Animations",
+        "Sales Manual Visualizations",
+        "3D Interactive Animations",
+        "2D Flash Animations",
+        "AR/VR Services",
+        "Motion Graphics Picture",
+        "Digital SOPs",
+      ].map((service, index) => (
+        <div
+          key={index}
+          className="group transition transform hover:-translate-y-1 bg-white/10 hover:bg-white/20 rounded-xl p-4 text-white/90 backdrop-blur-sm border border-white/10 shadow-md hover:shadow-lg"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-pink-400 group-hover:scale-125 transition" />
+            <p className="text-sm sm:text-base">{service}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+
+          {/* section for Industries Section  Industries We Serve */}
+          <section className="py-16 px-4 bg-black/50 backdrop-blur-sm border-t rounded-2xl border-white/5 mb-16">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-center">
+                Industries We Serve
+              </h2>
+              <p className="text-white/70 text-center max-w-3xl mx-auto mb-12">
+                Our expertise spans various industries, allowing us to create
+                tailored solutions for each sector:
+              </p>
+              <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-white/80">
+                {[
+                  "Automotive",
+                  "Pharma",
+                  "Textile",
+                  "Food Packaging",
+                  "Logistics",
+                  "Other Domains",
+                ].map((industry, index) => (
+                  <li
+                    key={index}
+                    className=" hover:bg-white/5 hover:border-red-700 transition rounded-lg px-4 py-2 backdrop-blur-sm border border-white/10"
+                  >
+                    {industry}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+
+          {/* add a section with marquee for client logos */}
+          <section className="py-16 w-full mb-16">
+            <div className=" mx-auto">
+              <h2 className="text-4xl md:text-5xl font-bold mb-10 text-center text-white">
+                Our Clients
+              </h2>
+              <div className="relative overflow-hidden">
+                <div className="flex animate-marquee space-x-12 ">
+                  {[
+                    "/clients/asset 1.png",
+                    "/clients/asset 2.png",
+                    "/clients/asset 3.png",
+                    "/clients/asset 4.png",
+                    "/clients/asset 5.png",
+                    "/clients/asset 6.png",
+                    "/clients/asset 7.png",
+                    "/clients/asset 8.png",
+                    "/clients/asset 9.png",
+                    "/clients/asset 10.png",
+                    "/clients/asset 11.png",
+                    "/clients/asset 12.png",
+                    "/clients/asset 13.png",
+                    "/clients/asset 14.png",
+                    "/clients/asset 15.png",
+                    "/clients/asset 16.png",
+                    "/clients/asset 17.png",
+                    "/clients/asset 18.png",
+                    "/clients/asset 19.png",
+                    "/clients/asset 20.png",
+                    "/clients/asset 21.png",
+                  ].map((logo, index) => (
+                    <img
+                      key={index}
+                      src={logo}
+                      alt={`Client ${index + 1}`}
+                      className="h-16 w-auto opacity-80 hover:opacity-100 transition"
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </section>
 
-          {/* Search results */}
+          {/* **Featured Projects Section**
+   - Heading: “Featured Work”
+   - Show 2-3 embedded YouTube videos in cards
+   - Each card has: thumbnail, video title, short description */}
 
-
-          {/* How it works section */}
-          <section ref={howSectionRef} id="how" className="py-16 px-4 border-t border-white/5">
+          <section className="py-16 px-4 rounded-2xl border-white/5 mb-16">
             <div className="max-w-6xl mx-auto">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-center">How it works</h2>
-              <p className="text-white/70 text-center max-w-3xl mx-auto mb-16">
-                Our service uses advanced technologies for instant auto parts search across thousands of stores in your
-                city
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-center">
+                Featured Work
+              </h2>
+              <p className="text-white/70 text-center max-w-3xl mx-auto mb-12">
+                Explore our recent projects that showcase our expertise in 3D
+                modeling, animation, and immersive content.
               </p>
 
-              <div className="grid md:grid-cols-3 gap-8 mb-16 relative">
-                {/* Connection line for desktop */}
-                <div className="hidden md:block absolute top-24 left-[calc(16.67%+8px)] right-[calc(16.67%+8px)] h-0.5">
-                  <div className="h-full bg-white/10 relative">
-                    {/* Точки на линии, соответствующие центрам блоков */}
-                    <div className="absolute top-1/2 left-1/6 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-red-500 rounded-full"></div>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-red-500 rounded-full"></div>
-                    <div className="absolute top-1/2 left-5/6 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-red-500 rounded-full"></div>
-                  </div>
-                </div>
-
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[
                   {
-                    icon: <Search className="h-8 w-8 text-red-400" />,
-                    title: "Enter your query",
+                    title: "Industrial Plant Animation",
                     description:
-                      "Enter part name or article number, and we'll instantly check availability across thousands of stores",
-                    benefits: [
-                      "Smart search understands even imprecise queries",
-                      "Automatic city detection",
-                      "Search history for quick access",
-                    ],
+                      "A detailed 3D animation of a manufacturing plant.",
+                    videoId: "dQw4w9WgXcQ",
                   },
                   {
-                    icon: <Layers className="h-8 w-8 text-red-400" />,
-                    title: "Choose the best offer",
-                    description: "Compare prices, location and availability, choose the optimal option",
-                    benefits: [
-                      "Sort by price, distance and rating",
-                      "Filter by availability and manufacturer",
-                      "Detailed information about each offer",
-                    ],
+                    title: "Cinematic Product Showcase",
+                    description:
+                      "A cinematic video showcasing a new product launch.",
+                    videoId: "eYq7WapuDLU",
                   },
                   {
-                    icon: <Zap className="h-8 w-8 text-red-400" />,
-                    title: "Contact the store",
-                    description: "Call the store directly or request a callback through our service",
-                    benefits: [
-                      "Direct contact without intermediaries",
-                      "Parts reservation capability",
-                      "Route building to store",
-                    ],
+                    title: "Augmented Reality Experience",
+                    description:
+                      "An AR experience for an automotive exhibition.",
+                    videoId: "tgbNymZ7vqY",
                   },
-                ].map((step, index) => (
-                  <div key={index} className="relative group">
-                    <div className="absolute -inset-px bg-gradient-to-r from-red-500/0 via-red-500/0 to-red-500/0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"></div>
-
-                    <div className="relative border border-white/10 rounded-2xl p-6 h-full transition-all duration-300 group-hover:border-red-500/50 group-hover:bg-white/5">
-                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 rounded-full bg-black border border-white/10 flex items-center justify-center text-xl font-bold">
-                        {index + 1}
-                      </div>
-
-                      <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-6 mt-4">
-                        {step.icon}
-                      </div>
-
-                      <h3 className="text-xl font-bold mb-3">{step.title}</h3>
-                      <p className="text-white/70 mb-6">{step.description}</p>
-
-                      <div className="space-y-2">
-                        {step.benefits.map((benefit, i) => (
-                          <div key={i} className="flex items-start gap-2">
-                            <div className="w-5 h-5 rounded-full bg-red-500/20 flex-shrink-0 flex items-center justify-center mt-0.5">
-                              <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                            </div>
-                            <p className="text-sm text-white/60">{benefit}</p>
-                          </div>
-                        ))}
-                      </div>
+                ].map((project, index) => (
+                  <div
+                    key={index}
+                    className="bg-white/10 rounded-lg overflow-hidden hover:bg-white/20 hover:border-red-700 transition"
+                  >
+                    <div className="aspect-video relative">
+                      <Image
+                        src={`https://img.youtube.com/vi/${project.videoId}/hqdefault.jpg`}
+                        alt={project.title}
+                        width={1280}
+                        height={720}
+                        className="object-cover w-full h-full"
+                      />
+                      <a
+                        href={`https://www.youtube.com/watch?v=${project.videoId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute inset-0 flex items-center justify-center bg-black/50 hover:bg-black/70 transition"
+                      >
+                        <ArrowRight className="h-8 w-8 text-white" />
+                      </a>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-xl font-semibold mb-2">
+                        {project.title}
+                      </h3>
+                      <p className="text-white/70">{project.description}</p>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="border border-white/10 rounded-2xl p-8 mb-16 bg-white/5 backdrop-blur-sm">
-                <h3 className="text-2xl font-bold mb-6 text-center">Service advantages</h3>
-
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {[
-                    {
-                      title: "Time saving",
-                      description: "Users save up to 3 hours on average searching for needed parts",
-                      icon: <Clock className="h-6 w-6 text-red-400" />,
-                    },
-                    {
-                      title: "Money saving",
-                      description: "Price comparison allows saving up to 30% on parts cost",
-                      icon: <DollarSign className="h-6 w-6 text-green-400" />,
-                    },
-                    {
-                      title: "Real-time data",
-                      description: "Availability and price information updates in real-time",
-                      icon: <RefreshCw className="h-6 w-6 text-red-400" />,
-                    },
-                    {
-                      title: "Artificial Intelligence",
-                      description: "AI analyzes queries and finds exact matches even with imprecise requests",
-                      icon: <Sparkles className="h-6 w-6 text-red-400" />,
-                    },
-                  ].map((benefit, index) => (
-                    <div
-                      key={index}
-                      className="border border-white/10 rounded-xl p-4 hover:border-red-500/50 hover:bg-white/5 transition-all duration-300"
-                    >
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
-                          {benefit.icon}
-                        </div>
-                        <h4 className="font-bold">{benefit.title}</h4>
-                      </div>
-                      <p className="text-white/70 text-sm">{benefit.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="border border-white/10 rounded-2xl p-8 mb-16 bg-gradient-to-br from-black to-red-950/30 backdrop-blur-sm">
-                <h3 className="text-2xl font-bold mb-6 text-center flex items-center justify-center gap-2">
-                  <Sparkles className="h-6 w-6 text-red-400" />
-                  Artificial Intelligence at the core of search
-                </h3>
-
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                    <h4 className="text-xl font-semibold text-red-400">Smart parts search</h4>
-                    <p className="text-white/70">
-                      Our service uses advanced AI algorithms and MeiliSearch to index millions of parts, allowing you
-                      to find needed parts even with imprecise queries and typos.
-                    </p>
-                    <ul className="space-y-2">
-                      <li className="flex items-start gap-2">
-                        <div className="w-5 h-5 rounded-full bg-red-500/20 flex-shrink-0 flex items-center justify-center mt-0.5">
-                          <Check className="h-3 w-3 text-red-400" />
-                        </div>
-                        <p className="text-sm text-white/70">Understands natural language queries</p>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <div className="w-5 h-5 rounded-full bg-red-500/20 flex-shrink-0 flex items-center justify-center mt-0.5">
-                          <Check className="h-3 w-3 text-red-400" />
-                        </div>
-                        <p className="text-sm text-white/70">Recognizes part analogs and substitutes</p>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <div className="w-5 h-5 rounded-full bg-red-500/20 flex-shrink-0 flex items-center justify-center mt-0.5">
-                          <Check className="h-3 w-3 text-red-400" />
-                        </div>
-                        <p className="text-sm text-white/70">Considers compatibility with your vehicle</p>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="relative">
-                    <div className="absolute -inset-px bg-gradient-to-r from-red-500/20 via-red-500/10 to-red-500/20 rounded-2xl blur-md"></div>
-                    <div className="relative border border-white/10 rounded-2xl p-6 h-full">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center">
-                          <svg
-                            className="w-6 h-6 text-red-400"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
-                              fill="currentColor"
-                            />
-                            <path
-                              d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z"
-                              fill="currentColor"
-                            />
-                          </svg>
-                        </div>
-                        <h4 className="text-xl font-semibold">MeiliSearch с ИИ</h4>
-                      </div>
-                      <p className="text-white/70 mb-4">
-                        We use MeiliSearch with AI integration to create the fastest and most accurate auto parts search
-                        system.
-                      </p>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-white/50">Search speed</span>
-                        <span className="text-red-400 font-medium">{"<"} 50 мс</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-white/10 rounded-full mt-1 mb-3">
-                        <div className="h-full bg-red-500 rounded-full" style={{ width: "95%" }}></div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-white/50">Result accuracy</span>
-                        <span className="text-red-400 font-medium">99.7%</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-white/10 rounded-full mt-1">
-                        <div className="h-full bg-red-500 rounded-full" style={{ width: "97%" }}></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative mb-16">
-                <div className="absolute -inset-px bg-gradient-to-r from-red-500/20 via-red-500/20 to-red-500/20 rounded-2xl blur-md"></div>
-
-                <div className="relative border border-white/10 rounded-2xl overflow-hidden">
-                  <div className="aspect-video relative">
-                    <Image
-                      src="/placeholder.svg?height=720&width=1280"
-                      width={1280}
-                      height={720}
-                      alt="Демонстрация работы сервиса"
-                      className="object-cover w-full h-full"
-                    />
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <div className="w-20 h-20 rounded-full bg-red-600/80 flex items-center justify-center">
-                        <div className="w-0 h-0 border-t-8 border-t-transparent border-l-16 border-l-white border-b-8 border-b-transparent ml-2"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-center">
-                <h3 className="text-2xl font-bold mb-6">Ready to find parts?</h3>
-                <Button
-                  className="rounded-full bg-red-600 hover:bg-red-700 h-12 px-8 text-lg"
-                  onClick={() => scrollToSection("search")}
-                >
-                  Start search
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+              {/* Call to Action */}
+              <div className="text-center mt-12">
+                  <Link href="/projects" >
+                <button className="bg-gradient-to-r from-red-500 to-red-900 hover:from-red-700 hover:to-red-500 px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105">
+                    View All Projects
+                </button>
+                  </Link>
               </div>
             </div>
           </section>
 
-          {/* Pricing section */}
-          <section ref={pricingSectionRef} id="pricing" className="py-16 px-4 border-t border-white/5">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-center">Pricing</h2>
-              <p className="text-white/70 text-center max-w-3xl mx-auto mb-16">
-                Choose the right plan for auto parts search. Free plan available for personal use
-              </p>
+          {/*  **Client Testimonials**
+   - Heading: “What Our Clients Say”
+   - Quote: “With the same marketing team, we secured significantly more business using branding animations created by Motionpix.” */}
 
-
-
+          <section className="py-16 my-16 px-4  border-t rounded-2xl border-white/5">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-4xl md:text-5xl font-bold mb-8">
+                What Our Clients Say
+              </h2>
+              <blockquote className="text-xl md:text-2xl italic text-white/70 border-l-4 border-red-500 pl-6">
+                “With the same marketing team, we secured significantly more
+                business using branding animations created by Motionpix.”
+              </blockquote>
             </div>
           </section>
 
           {/* For business section */}
-          <section ref={businessSectionRef} id="business" className="py-16 px-4 border-t border-white/5">
+          <section
+            ref={businessSectionRef}
+            id="contact"
+            className="py-16 px-4 border-t border-white/5 scroll-mt-[100px]"
+          >
             <div className="max-w-6xl mx-auto">
-              <h2 className="text-4xl md:text-5xl font-bold mb-12 text-center">For Business</h2>
+              <h2 className="text-4xl md:text-5xl font-bold mb-12 text-center">
+                For Business
+              </h2>
 
               <div className="grid md:grid-cols-2 gap-12 mb-16">
                 <div>
                   <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
                     <Sparkles className="h-6 w-6 text-red-400" />
-                    Connection benefits
+                    Contact Information
                   </h3>
 
-                  <div className="space-y-6">
-                    {[
-                      {
-                        title: "New customers",
-                        description: "Attract customers who are specifically looking for parts in your city",
-                      },
-                      {
-                        title: "Automatic synchronization",
-                        description: "Integration with your accounting system to update availability and price data",
-                      },
-                      {
-                        title: "Analytics and statistics",
-                        description: "Get data on popular queries and demand in your region",
-                      },
-                      {
-                        title: "Easy connection",
-                        description: "Free connection and technical support at all stages",
-                      },
-                    ].map((item, index) => (
-                      <div
-                        key={index}
-                        className="border border-white/10 rounded-xl p-4 hover:border-red-500/50 hover:bg-white/5 transition-all duration-300"
-                      >
-                        <h4 className="font-bold mb-2">{item.title}</h4>
-                        <p className="text-white/70">{item.description}</p>
-                      </div>
-                    ))}
+                  <div className="space-y-4 text-white/80">
+                    <div className="border border-white/10 rounded-xl p-4 bg-white/5 backdrop-blur-sm">
+                      <p className="font-semibold">Address:</p>
+                      <p>
+                        54/A, Rakshalekha Society,
+                        <br />
+                        Dhanakawadi, Pune 411043
+                      </p>
+                    </div>
+
+                    <div className="border border-white/10 rounded-xl p-4 bg-white/5 backdrop-blur-sm">
+                      <p className="font-semibold">Phone:</p>
+                      <p>
+                        <a
+                          href="tel:+919822055205"
+                          className="hover:text-red-400 transition"
+                        >
+                          +91 9822055205
+                        </a>
+                      </p>
+                    </div>
+
+                    <div className="border border-white/10 rounded-xl p-4 bg-white/5 backdrop-blur-sm">
+                      <p className="font-semibold">Email:</p>
+                      <p>
+                        <a
+                          href="mailto:info@motionpixindia.com"
+                          className="hover:text-red-400 transition"
+                        >
+                          info@motionpixindia.com
+                        </a>
+                      </p>
+                    </div>
+
+                    <div className="border border-white/10 rounded-xl p-4 bg-white/5 backdrop-blur-sm">
+                      <p className="font-semibold">Website:</p>
+                      <p>
+                        <a
+                          href="https://www.motionpixindia.com"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-red-400 transition"
+                        >
+                          www.motionpixindia.com
+                        </a>
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -600,105 +674,164 @@ export default function UltraModernAutoPartsSearch() {
                   <div className="relative">
                     <div className="absolute -inset-px bg-gradient-to-r from-red-500/20 via-red-500/20 to-red-500/20 rounded-2xl blur-md"></div>
 
-                    <div className="relative border border-white/10 rounded-2xl p-6 bg-black/50 backdrop-blur-sm">
+                    <div className="relative border border-white/10 rounded-2xl p-6 bg-black/50 backdrop-blur-sm max-w-xl mx-auto">
                       <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                        <Compass className="h-6 w-6 text-red-400" />
-                        Submit application
+                        <Mail className="h-6 w-6 text-red-400" />
+                        Contact Us
                       </h3>
+                      <section ref={contactSectionRef} className="scroll-mt-40">
+                        <form
+                          ref={formRef}
+                          onSubmit={handleSubmit}
+                          className="space-y-4"
+                        >
+                          <div>
+                            <label
+                              className="block text-sm text-white/70 mb-1"
+                              htmlFor="name"
+                            >
+                              Full Name
+                            </label>
+                            <Input
+                              id="name"
+                              name="name"
+                              required
+                              placeholder="Enter your name"
+                              className="bg-white/5 border-white/10 rounded-lg focus:border-red-500 focus:ring-red-500 text-white"
+                            />
+                          </div>
 
-                      <form className="space-y-4">
-                        <div>
-                          <label className="block text-sm text-white/70 mb-1">Company name</label>
-                          <Input className="bg-white/5 border-white/10 rounded-lg focus:border-red-500 focus:ring-red-500 text-white" />
-                        </div>
+                          <div>
+                            <label
+                              className="block text-sm text-white/70 mb-1"
+                              htmlFor="email"
+                            >
+                              Email
+                            </label>
+                            <Input
+                              id="email"
+                              name="email"
+                              type="email"
+                              required
+                              placeholder="Enter your email"
+                              className="bg-white/5 border-white/10 rounded-lg focus:border-red-500 focus:ring-red-500 text-white"
+                            />
+                          </div>
 
-                        <div>
-                          <label className="block text-sm text-white/70 mb-1">Email</label>
-                          <Input
-                            type="email"
-                            className="bg-white/5 border-white/10 rounded-lg focus:border-red-500 focus:ring-red-500 text-white"
-                          />
-                        </div>
+                          <div>
+                            <label
+                              className="block text-sm text-white/70 mb-1"
+                              htmlFor="phone"
+                            >
+                              Phone
+                            </label>
+                            <Input
+                              id="phone"
+                              name="phone"
+                              type="tel"
+                              required
+                              placeholder="Enter your phone number"
+                              className="bg-white/5 border-white/10 rounded-lg focus:border-red-500 focus:ring-red-500 text-white"
+                            />
+                          </div>
 
-                        <div>
-                          <label className="block text-sm text-white/70 mb-1">Phone</label>
-                          <Input
-                            type="tel"
-                            className="bg-white/5 border-white/10 rounded-lg focus:border-red-500 focus:ring-red-500 text-white"
-                          />
-                        </div>
+                          <div>
+                            <label
+                              className="block text-sm text-white/70 mb-1"
+                              htmlFor="message"
+                            >
+                              Message
+                            </label>
+                            <Textarea
+                              id="message"
+                              name="message"
+                              rows={4}
+                              required
+                              placeholder="How can we help you?"
+                              className="bg-white/5 border-white/10 rounded-lg focus:border-red-500 focus:ring-red-500 text-white"
+                            />
+                          </div>
 
-                        <div>
-                          <label className="block text-sm text-white/70 mb-1">City</label>
-                          <Input className="bg-white/5 border-white/10 rounded-lg focus:border-red-500 focus:ring-red-500 text-white" />
-                        </div>
-
-                        <Button type="submit" className="w-full rounded-lg bg-red-600 hover:bg-red-700 h-12">
-                          Submit application
-                        </Button>
-                      </form>
-                    </div>
-                  </div>
-
-                  <div className="mt-8 p-6 border border-white/10 rounded-2xl">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-bold">Connection statistics</h4>
-                      <div className="text-sm text-white/50">Average indicators</div>
-                    </div>
-
-                    <div className="space-y-4">
-                      {[
-                        { label: "Customer growth", value: "+40%" },
-                        { label: "Sales increase", value: "+35%" },
-                        { label: "Inventory optimization", value: "-20%" },
-                      ].map((stat, index) => (
-                        <div key={index} className="flex justify-between items-center">
-                          <span className="text-white/70">{stat.label}</span>
-                          <span className="font-bold text-red-400">{stat.value}</span>
-                        </div>
-                      ))}
+                          <Button
+                            type="submit"
+                            className="w-full rounded-lg bg-red-600 hover:bg-red-700 h-12"
+                            disabled={loading}
+                          >
+                            {loading ? (
+                              <Loader2 className="animate-spin w-5 h-5" />
+                            ) : (
+                              "Send Message"
+                            )}
+                          </Button>
+                        </form>
+                      </section>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="text-center">
-                <h3 className="text-2xl font-bold mb-6">Join our store network</h3>
-                <Button className="rounded-full bg-red-600 hover:bg-red-700 h-12 px-8 text-lg">
-                  Become a partner
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
               </div>
             </div>
           </section>
         </TracingBeam>
 
         {/* Footer */}
-        <footer className="border-t border-white/5 py-8">
+        <footer className="border-t border-white/5 backdrop-blur-md bg-black/30 py-8">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <span className="font-bold">AUTOPARTS</span>
+              <span className="font-bold">
+                {/* add logo */}
+                <Image
+                  src="/Logo.png"
+                  alt="Logo"
+                  width={50}
+                  height={50}
+                  className="inline-block mr-2"
+                ></Image>
+                Motion<span className="text-red-500">Pix</span> India
+              </span>
 
               <div className="flex gap-6">
-                <a href="#" className="text-white/50 hover:text-white transition-colors">
-                  About service
+                <a
+                  href="https://www.facebook.com/profile.php?id=61578380430447"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/50 hover:text-white transition-colors"
+                >
+                  <Facebook className="w-5 h-5" />
                 </a>
-                <a href="#" className="text-white/50 hover:text-white transition-colors">
-                  Terms of use
+                <a
+                  href="https://www.instagram.com/motionpixindia/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/50 hover:text-white transition-colors"
+                >
+                  <Instagram className="w-5 h-5" />
                 </a>
-                <a href="#" className="text-white/50 hover:text-white transition-colors">
-                  Privacy
+                <a
+                  href="https://www.linkedin.com/in/motionpix-india-615579375/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/50 hover:text-white transition-colors"
+                >
+                  <Linkedin className="w-5 h-5" />
                 </a>
-                <a href="#" className="text-white/50 hover:text-white transition-colors">
-                  Contacts
+                <a
+ href="https://www.youtube.com/channel/UCI0DaU_jECXW-gAsbk7_JGA"
+                   target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/50 hover:text-white transition-colors"
+                >
+                  <Youtube className="w-5 h-5" />
                 </a>
+
               </div>
 
-              <div className="text-white/50">© {new Date().getFullYear()} AUTOPARTS</div>
+              <div className="text-white/50 pb-8 lg:pb-0 capitalize">
+                © {new Date().getFullYear()} MotionPix cinematix india Pvt. Ltd.
+              </div>
             </div>
           </div>
         </footer>
       </div>
     </div>
-  )
+  );
 }

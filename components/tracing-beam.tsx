@@ -84,7 +84,7 @@ export const TracingBeam = ({
   return (
     <div
       ref={ref}
-      className={cn("relative mx-auto h-full w-full max-w-6xl", className)}
+      className={cn("relative mx-auto h-full w-full max-w-6xl z-50  lg:block md:hidden sm:hidden", className)}
     >
       <div className="absolute top-3 -left-4 md:-left-20">
         <div
