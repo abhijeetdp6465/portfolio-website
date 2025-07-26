@@ -8,7 +8,7 @@ import Script from "next/dist/client/script"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  metadataBase: new URL('https://motionpixindia.com'),
+  metadataBase: new URL('https://www.motionpixindia.com'),
   title: {
     
     default: 'Motionpix | 3D Visuals & AR Experiences',
@@ -29,11 +29,11 @@ export const metadata = {
     title: 'Motionpix | 3D Visuals & AR Experiences',
     description:
       'Cinematic visuals, immersive animations, and AR-powered storytelling — crafted for industrial excellence.',
-    url: 'https://motionpixindia.com',
+    url: 'https://www.motionpixindia.com',
     siteName: 'Motionpix',
     images: [
       {
-        url: 'https://motionpixindia.com/Banner.png', // 👈 Absolute URL preferred for OG
+        url: 'https://www.motionpixindia.com/Banner.png', // 👈 Absolute URL preferred for OG
         width: 1200,
         height: 630,
         alt: 'Motionpix Visuals Banner',
@@ -47,7 +47,7 @@ export const metadata = {
     title: 'Motionpix | 3D Visuals & AR Experiences',
     description:
       'Cinematic visuals, immersive animations, and AR-powered storytelling — crafted by Motionpix.',
-    images: ['https://motionpixindia.com/Banner.png'],
+    images: ['https://www.motionpixindia.com/Banner.png'],
     creator: '@motionpix', // 👈 Optional if you have a Twitter handle
   },
   icons: {
@@ -83,8 +83,8 @@ export const structuredData = {
   '@context': 'https://schema.org',
   '@type': 'AnimationStudio',
   name: 'Motionpix India',
-  url: 'https://motionpixindia.com',
-  logo: 'https://motionpixindia.com/logo-schema.png',
+  url: 'https://www.motionpixindia.com',
+  logo: 'https://www.motionpixindia.com/logo-schema.png',
   foundingDate: '2017',
   founder: {
     '@type': 'Person',
@@ -121,7 +121,7 @@ export default function RootLayout({
   type="application/ld+json"
   dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
 />
-
+<link rel="icon" href="/Logo.png" type="image/png" />
 <meta name="google-site-verification" content="8P17svm1vgfIs13oCbk6sSzoLWvOr5zMdl3h-tYe-GI" />
       </head>
       <body className={inter.className}>
